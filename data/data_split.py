@@ -11,21 +11,21 @@ train_dir = work_path + r'\\train'
 val_dir = work_path + r'\\val'
 test_dir = work_path + r'\\test'
 
-# try:
-#     mkdir(train_dir)
-#     mkdir(train_dir + r'\yes')
-#     mkdir(train_dir + r'\no')
+try:
+    mkdir(train_dir)
+    mkdir(train_dir + r'\yes')
+    mkdir(train_dir + r'\no')
     
-#     mkdir(val_dir)
-#     mkdir(val_dir + r'\yes')
-#     mkdir(val_dir + r'\no')
+    mkdir(val_dir)
+    mkdir(val_dir + r'\yes')
+    mkdir(val_dir + r'\no')
     
-#     mkdir(test_dir)
-#     mkdir(test_dir + r'\yes')
-#     mkdir(test_dir + r'\no')
-# except FileExistsError:
-#     print(r'Data has been already split. Delete train, val, and test',
-#           'directories to split the data again.')
+    mkdir(test_dir)
+    mkdir(test_dir + r'\yes')
+    mkdir(test_dir + r'\no')
+except FileExistsError:
+    print(r'Data has been already split. Delete train, val, and test',
+          'directories to split the data again.')
     
           
 def train_val_test_split(sizes:tuple):
@@ -53,9 +53,53 @@ def train_val_test_split(sizes:tuple):
     
     for image in train_images_yes:
         try:
-            copy2(yes_path + r'\\' + image, train_dir + r'\\yes' + image)
+            copy2(yes_path + r'\\' + image, train_dir + r'\\yes\\' + image)
         except FileExistsError:
-            print(r'Data has been already split. Delete train, val, and test',
+            print(r'Train data has been already set. Delete train, val, and test',
                   'directories to split the data again.')
-    
+        except PermissionError:
+            pass
+    for image in train_images_no:
+        try:
+            copy2(no_path + r'\\' + image, train_dir + r'\\no\\' + image)
+        except FileExistsError:
+            print(r'Train data has been already set. Delete train, val, and test',
+                  'directories to split the data again.')
+        except PermissionError:
+            pass
+    for image in val_images_yes:
+        try:
+            copy2(yes_path + r'\\' + image, val_dir + r'\\yes\\' + image)
+        except FileExistsError:
+            print(r'val data has been already set. Delete val, val, and test',
+                  'directories to split the data again.')
+        except PermissionError:
+            pass
+    for image in val_images_no:
+        try:
+            copy2(no_path + r'\\' + image, val_dir + r'\\no\\' + image)
+        except FileExistsError:
+            print(r'val data has been already set. Delete val, val, and test',
+                  'directories to split the data again.')
+        except PermissionError:
+            pass
+    for image in test_images_yes:
+        try:
+            copy2(yes_path + r'\\' + image, test_dir + r'\\yes\\' + image)
+        except FileExistsError:
+            print(r'test data has been already set. Delete test, test, and test',
+                  'directories to split the data again.')
+        except PermissionError:
+            pass
+    for image in test_images_no:
+        try:
+            copy2(no_path + r'\\' + image, test_dir + r'\\no\\' + image)
+        except FileExistsError:
+            print(r'test data has been already set. Delete test, test, and test',
+                  'directories to split the data again.')
+        except PermissionError:
+            pass
+    print('Data splitted correctly.')
+    return None
+
 train_val_test_split((70, 20, 10))
