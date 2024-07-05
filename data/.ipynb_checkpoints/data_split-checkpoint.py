@@ -6,10 +6,15 @@ current_path = getcwd()
 work_path = current_path + r'\data\brain_tumor_dataset'
 yes_path = work_path + r'\yes'
 no_path = work_path + r'\no'
+objective_path = work_path + r'\split_data'
+try:
+    mkdir(objective_path)
+except FileExistsError:
+    print(r'Data has already been split.')
 
-train_dir = work_path + r'\\train'
-val_dir = work_path + r'\\val'
-test_dir = work_path + r'\\test'
+train_dir = objective_path + r'\\train'
+val_dir = objective_path + r'\\val'
+test_dir = objective_path + r'\\test'
 
 try:
     mkdir(train_dir)
@@ -99,7 +104,5 @@ def train_val_test_split(sizes:tuple):
                   'directories to split the data again.')
         except PermissionError:
             pass
-    print('Data splitted correctly.')
+    print('Data split correctly.')
     return None
-
-train_val_test_split((70, 20, 10))

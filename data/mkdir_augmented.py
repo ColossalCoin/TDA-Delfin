@@ -1,6 +1,6 @@
 from os import getcwd, mkdir
 
-current_path = getcwd() + r'\data\brain_tumor_dataset'
+current_path = getcwd() + r'\data\brain_tumor_dataset\split_data'
 
 def mk_augmented_dir():
     try:
