@@ -6,7 +6,8 @@ from gtda.homology import CubicalPersistence
 from gtda.diagrams import Scaler, PersistenceEntropy, Amplitude
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.model_selection import train_test_split
-from time import time
+import pickle
+from os import getcwd
 
 np.random.seed(123)
 tumor_yes, tumor_no = get_images((224, 224))
@@ -63,16 +64,6 @@ pipe_binarizer = make_union(
 )
 tda_pipeline = make_union(pipe_original, pipe_binarizer)
 
-X = np.concatenate((tumor_yes, tumor_no))
-y = np.concatenate((np.ones(tumor_yes.shape[0]), np.zeros(tumor_no.shape[0])))
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=123)
-
-start = time()
-X_train_pipeline = tda_pipeline.fit_transform(X_train)
-stop = time()
-
-diff = stop - start
-
-print(f'Tamaño de la muestra: {X_train.shape[0]}')
-print(f'Tiempo de ejecución en minutos: {diff / 60}')
+with open(r'models\tda_pipeline.pickle', 'wb') as file:
+    pickle.dump(tda_pipeline, file)
+    file.close()
