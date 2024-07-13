@@ -5,12 +5,6 @@ from numpy import asarray
 from pandas import Series
 
 current_path = getcwd()
-brain_tumor_yes = Path(current_path + r'\data\brain_tumor_dataset\yes')
-brain_tumor_no = Path(current_path + r'\data\brain_tumor_dataset\no')
-
-yes_images = listdir(brain_tumor_yes)
-no_images = listdir(brain_tumor_no)
-
 
 def image_to_array(path:Path):
     image = Image.open(path)
@@ -18,9 +12,23 @@ def image_to_array(path:Path):
     image_array = asarray(image)
     return image_array
     
+<<<<<<< HEAD:data/get_raw_images.py
 def get_images():
+=======
+def get_images(image_size:tuple, augmented=False):
+>>>>>>> new_datasplit:data/image_converter.py
     yes_arrays = []
     no_arrays = []
+    
+    if augmented:
+        brain_tumor_yes = Path(current_path + r'\data\brain_tumor_dataset\split_data\train_augmented\yes')
+        brain_tumor_no = Path(current_path + r'\data\brain_tumor_dataset\split_data\train_augmented\no')
+    else:
+        brain_tumor_yes = Path(current_path + r'\data\brain_tumor_dataset\yes')
+        brain_tumor_no = Path(current_path + r'\data\brain_tumor_dataset\no')
+    
+    yes_images = listdir(brain_tumor_yes)
+    no_images = listdir(brain_tumor_no)
     
     for image in yes_images:
         if image != '.ipynb_checkpoints':
