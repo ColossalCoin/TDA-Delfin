@@ -17,23 +17,23 @@ def get_images(image_size:tuple, augmented=False, mode='L'):
     no_arrays = []
     
     if augmented:
-        brain_tumor_yes = Path(current_path + r'\data\brain_tumor_dataset\split_data\train_augmented\yes')
-        brain_tumor_no = Path(current_path + r'\data\brain_tumor_dataset\split_data\train_augmented\no')
+        brain_tumor_yes = Path(current_path + r'/data/brain_tumor_dataset/split_data/train_augmented/yes')
+        brain_tumor_no = Path(current_path + r'/data/brain_tumor_dataset/split_data/train_augmented/no')
     else:
-        brain_tumor_yes = Path(current_path + r'\data\brain_tumor_dataset\yes')
-        brain_tumor_no = Path(current_path + r'\data\brain_tumor_dataset\no')
+        brain_tumor_yes = Path(current_path + r'/data/brain_tumor_dataset/yes')
+        brain_tumor_no = Path(current_path + r'/data/brain_tumor_dataset/no')
     
     yes_images = listdir(brain_tumor_yes)
     no_images = listdir(brain_tumor_no)
     
     for image in yes_images:
         if image != '.ipynb_checkpoints':
-            image_path = Path(str(brain_tumor_yes) + r'\\' + image)
+            image_path = Path(str(brain_tumor_yes) + r'/' + image)
             yes_arrays.append(image_to_array(image_path, image_size, mode))
 
     for image in no_images:
         if image != '.ipynb_checkpoints':
-            image_path = Path(str(brain_tumor_no) + r'\\' + image)
+            image_path = Path(str(brain_tumor_no) + r'/' + image)
             no_arrays.append(image_to_array(image_path, image_size, mode))
 
     yes_arrays = asarray(yes_arrays)
