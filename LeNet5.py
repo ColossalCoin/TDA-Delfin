@@ -4,12 +4,6 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
 
-images_yes, images_no = get_images((224, 224), mode='L')
-X = np.concatenate((images_yes, images_no))
-y = np.concatenate((np.ones(images_yes.shape[0]), np.zeros(images_no.shape[0])))
-
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.33, random_state=123)
-
 def LeNet_5():
     model = Sequential()
     
@@ -44,8 +38,3 @@ def LeNet_5():
                   metrics=['accuracy'])
     
     return model
-
-model = LeNet_5()
-history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=20)
-# Save the model
-model.save('lenet5_model.h5')
