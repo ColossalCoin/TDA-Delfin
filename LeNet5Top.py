@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch
 
 class LeNet5Top(nn.Module):
     def __init__(self):
@@ -22,10 +23,8 @@ class LeNet5Top(nn.Module):
         self.dense2 = nn.Linear(84, 2)
         
     def forward(self, x, v):
-        # Concatena la imagen con el vector de características topológicas
-        x = torch.cat((x, v.unsqueeze(3)), dim=1)
         
-        # Pasa la entrada por las capas convolucionales
+        # Pasa la imagen por las capas convolucionales
         x = self.conv1(x)
         x = self.pool1(x)
         x = self.conv2(x)
@@ -34,6 +33,7 @@ class LeNet5Top(nn.Module):
         
         # Aplana la salida
         x = x.view(-1, 120 * 4 * 4)
+        x = torch.cat(x, v)
         
         # Pasa la entrada por las capas densas
         x = self.dense1(x)
