@@ -25,7 +25,11 @@ class LeNet_5(nn.Module):
     def forward(self, x):
         # Se aplican las convoluciones
         x = self.conv1(x)
+        x = self.pool1(x)
+        
         x = self.conv2(x)
+        x = self.pool2(x)
+        
         x = self.conv3(x)
         
         # Se apalana la salida
