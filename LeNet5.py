@@ -1,40 +1,38 @@
-import numpy as np
-from data.image_converter import get_images
-from sklearn.model_selection import train_test_split
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Conv2D, AveragePooling2D, Flatten, Dense
+import torch.nn as nn
 
-def LeNet_5():
-    model = Sequential()
-    
-    # C1: (None, 224, 224, 1) -> (None, 220, 220, 6).
-    model.add(Conv2D(6, kernel_size=(5, 5), strides=(1, 1), activation='tanh',
-                     input_shape=(224, 224, 1), padding='valid'))
-    
-    # P1: (None, 220, 220, 6) -> (None, 110, 110, 6).
-    model.add(AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
-    
-    # C2: (None, 110, 110, 6) -> (None, 106, 106, 16).
-    model.add(Conv2D(16, kernel_size=(5, 5), strides=(1, 1), activation='tanh',
-                     padding='valid'))
-    
-    # P2: (None, 106, 106, 16) -> (None, 53, 53, 16).
-    model.add(AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
-    
-    # Flatten: (None, 53, 53, 16) -> (None, 179 776).
-    model.add(Flatten())
-    
-    # FC1: (None, 179 776) -> (None, 120).
-    model.add(Dense(120, activation='tanh'))
-    
-    # FC2: (None, 120) -> (None, 84).
-    model.add(Dense(84, activation='tanh'))
-    
-    # FC3: (None, 84) -> (None, 10).
-    model.add(Dense(10, activation='softmax'))
-    
-    # Compile the model
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', 
-                  metrics=['accuracy'])
-    
-    return model
+class LeNet_5(nn.Module):
+    def __init__(self):
+        super().__init__()
+        
+        # C1 (224, 224, 1) -> (220, 220, 6)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=5)
+        # P1: (220, 220, 6) -> (110, 110, 6)
+        self.pool1 = nn.MaxPool2d(2)
+        
+        # C2: (110, 110, 6) -> (106, 106, 16)
+        self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5)
+        # P2: (106, 106, 16) -> (53, 53, 16)
+        self.pool2 = nn.MaxPool2d(2)
+        
+        # C3: (53, 53, 16) -> (49, 49, 120)
+        self.conv3 = nn.Conv2d(in_channels=16, out_channels=120, kernel_size=5)
+        
+        # FC1: (228 120) -> (120)
+        self.dense1 = nn.Linear(228120, 84)
+        # FC2: (120) -> (84)
+        self.dense2 = nn.Linear(84, 2)
+        
+    def forward(self, x):
+        # Se aplican las convoluciones
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        
+        # Se apalana la salida
+        x = x.view(-1, 228120)
+        
+        # Se aplican las capas densas
+        x = self.dense1
+        x= self.dense2
+        
+        return x
