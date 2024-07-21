@@ -17,7 +17,7 @@ class LeNet5Top(nn.Module):
         self.conv3 = nn.Conv2d(16, 120, 5)
         
         # Capa densa 1
-        self.dense1 = nn.Linear(120 * 4 * 4, 84)
+        self.dense1 = nn.Linear(120 * 4 * 4 + 756, 84)
         
         # Capa densa 2
         self.dense2 = nn.Linear(84, 2)
