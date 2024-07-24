@@ -9,23 +9,20 @@ from sklearn.model_selection import train_test_split
 import pickle
 from os import getcwd
 
-np.random.seed(123)
-tumor_yes, tumor_no = get_images((224, 224))
-
-thresholds = np.arange(0.1, 1, 0.1)
-centers = product({37, 112, 187}, {37, 112, 187})
+thresholds = np.arange(0.4, 0.7, 0.35/10)
+centers = [(84, 56), (56, 112), (84, 140), (140, 56), (168, 112), (140, 140)]
 
 binarizers = ([Binarizer(threshold=threshold, n_jobs=-1) for threshold in thresholds])
-radial_filtrations = ([RadialFiltration(center=np.asarray(center), n_jobs=-1) for center in centers])
-density_filtrations = ([DensityFiltration(radius=1, metric='euclidean', n_jobs=-1), 
-                        DensityFiltration(radius=10, metric='cityblock', n_jobs=-1)])
+radial_filtrations = [RadialFiltration(center=np.asarray(center), n_jobs=-1) for center in centers]
+density_filtration = [DensityFiltration(radius=14, metric='l1', n_jobs=-1)]
+filtrations = (radial_filtrations + density_filtration)
 
 steps_original = [
     [
-        filtration,
         CubicalPersistence(n_jobs=-1),
-        Scaler(n_jobs=-1)
-    ] for filtration in radial_filtrations 
+        Scaler(n_jobs=-1),
+        Filtering(homology_dimensions=[0, 1], epsilon=0.1)
+    ]
 ]
 
 steps_binarizer = [
@@ -33,28 +30,32 @@ steps_binarizer = [
         binarizer,
         filtration,
         CubicalPersistence(n_jobs=-1),
-        Scaler(n_jobs=-1)
-    ] for filtration in density_filtrations
+        Scaler(n_jobs=-1),
+        Filtering(homology_dimensions=[0, 1], epsilon=0.1)
+    ] for filtration in filtrations
     for binarizer in binarizers
 ]
 
-metric_iter = [
-    {'metric':'bottleneck', 'metric_params':{}},
+metrics = [
+    {'metric':'bottleneck'},
     {'metric':'wasserstein', 'metric_params':{'p':1}},
     {'metric':'wasserstein', 'metric_params':{'p':2}},
-    {'metric':'landscape', 'metric_params':{'p':1, 'n_layers':1, 'n_bins':100}},
-    {'metric':'landscape', 'metric_params':{'p':1, 'n_layers':2, 'n_bins':100}},
-    {'metric':'landscape', 'metric_params':{'p':2, 'n_layers':1, 'n_bins':100}},
-    {'metric':'landscape', 'metric_params':{'p':2, 'n_layers':2, 'n_bins':100}},
-    {'metric':'betti', 'metric_params':{'p':1, 'n_bins':100}},
-    {'metric':'betti', 'metric_params':{'p':2, 'n_bins':100}},
-    {'metric':'heat', 'metric_params':{'p':1, 'sigma':1.6, 'n_bins':100}},
-    {'metric':'heat', 'metric_params':{'p':1, 'sigma':3.2, 'n_bins':100}},
-    {'metric':'heat', 'metric_params':{'p':2, 'sigma':1.6, 'n_bins':100}},
-    {'metric':'heat', 'metric_params':{'p':2, 'sigma':3.2, 'n_bins':100}}
+    {'metric':'betti', 'metric_params':{'p':1, 'n_bins':30}},
+    {'metric':'betti', 'metric_params':{'p':2, 'n_bins':30}},
+    {'metric':'landscape', 'metric_params':{'p':1, 'n_bins':20, 'n_layers':1}},
+    {'metric':'landscape', 'metric_params':{'p':1, 'n_bins':20, 'n_layers':2}},
+    {'metric':'landscape', 'metric_params':{'p':2, 'n_bins':20, 'n_layers':1}},
+    {'metric':'landscape', 'metric_params':{'p':2, 'n_bins':20, 'n_layers':2}},
+    {'metric':'silhouette', 'metric_params':{'p':1, 'n_bins':100, 'power':0.1}},
+    {'metric':'silhouette', 'metric_params':{'p':2, 'n_bins':100, 'power':0.1}},
+    {'metric':'heat', 'metric_params':{'p':1, 'sigma':0.5, 'n_bins':100}},
+    {'metric':'heat', 'metric_params':{'p':2, 'sigma':0.5, 'n_bins':100}},
+    {'metric':'persistence_image', 'metric_params':{'p':1, 'sigma':0.6, 'n_bins':100}},
+    {'metric':'persistence_image', 'metric_params':{'p':2, 'sigma':0.6, 'n_bins':100}}        
 ]
-amplitudes = ([Amplitude(**metric, n_jobs=-1) for metric in metric_iter])
-amplitudes_union = make_union(*[PersistenceEntropy(nan_fill_value=-1)] + amplitudes)
+
+amplitudes = ([Amplitude(**metric, n_jobs=-1) for metric in metrics])
+amplitudes_union = make_union(*[PersistenceEntropy(nan_fill_value=None), NumberOfPoints(n_jobs=-1)] + amplitudes)
 
 pipe_original = make_union(
     *[make_pipeline(*step, amplitudes_union) for step in steps_original], n_jobs=-1
@@ -62,8 +63,5 @@ pipe_original = make_union(
 pipe_binarizer = make_union(
     *[make_pipeline(*step, amplitudes_union) for step in steps_binarizer], n_jobs=-1
 )
-tda_pipeline = make_union(pipe_original, pipe_binarizer)
 
-with open(r'models\tda_pipeline.pickle', 'wb') as file:
-    pickle.dump(tda_pipeline, file)
-    file.close()
+tda_pipeline = make_union(pipe_original, pipe_binarizer)
