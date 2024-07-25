@@ -1,13 +1,8 @@
-from data.image_converter import get_images
 import numpy as np
-from itertools import product
 from gtda.images import Binarizer, RadialFiltration, DensityFiltration
 from gtda.homology import CubicalPersistence
-from gtda.diagrams import Scaler, PersistenceEntropy, Amplitude
+from gtda.diagrams import Scaler, Filtering, PersistenceEntropy, Amplitude, NumberOfPoints
 from sklearn.pipeline import make_pipeline, make_union
-from sklearn.model_selection import train_test_split
-import pickle
-from os import getcwd
 
 thresholds = np.arange(0.4, 0.7, 0.35/10)
 centers = [(84, 56), (56, 112), (84, 140), (140, 56), (168, 112), (140, 140)]
@@ -55,7 +50,11 @@ metrics = [
 ]
 
 amplitudes = ([Amplitude(**metric, n_jobs=-1) for metric in metrics])
-amplitudes_union = make_union(*[PersistenceEntropy(nan_fill_value=None), NumberOfPoints(n_jobs=-1)] + amplitudes)
+amplitudes_union = make_union(
+    *[
+      PersistenceEntropy(nan_fill_value=None, n_jobs=-1), NumberOfPoints(n_jobs=-1)
+      ] + amplitudes
+    )
 
 pipe_original = make_union(
     *[make_pipeline(*step, amplitudes_union) for step in steps_original], n_jobs=-1
@@ -65,3 +64,6 @@ pipe_binarizer = make_union(
 )
 
 tda_pipeline = make_union(pipe_original, pipe_binarizer)
+
+def pipeline(images):
+    return tda_pipeline.fit_transform(images)
