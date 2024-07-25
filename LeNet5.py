@@ -5,7 +5,7 @@ class LeNet_5(nn.Module):
         super().__init__()
         
         # C1 (224, 224, 1) -> (220, 220, 6)
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=2, kernel_size=5)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5)
         # P1: (220, 220, 6) -> (110, 110, 6)
         self.pool1 = nn.MaxPool2d(2)
         
