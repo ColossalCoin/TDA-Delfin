@@ -1,4 +1,4 @@
-from os import getcwd, listdir
+from os import listdir
 from pathlib import Path
 from PIL import Image
 from numpy import asarray
