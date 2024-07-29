@@ -52,7 +52,7 @@ metrics = [
 amplitudes = ([Amplitude(**metric, n_jobs=-1) for metric in metrics])
 amplitudes_union = make_union(
     *[
-      PersistenceEntropy(nan_fill_value=None, n_jobs=-1), NumberOfPoints(n_jobs=-1)
+      PersistenceEntropy(nan_fill_value=-1, n_jobs=-1), NumberOfPoints(n_jobs=-1)
       ] + amplitudes
     )
 
