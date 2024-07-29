@@ -65,5 +65,7 @@ pipe_binarizer = make_union(
 
 tda_pipeline = make_union(pipe_original, pipe_binarizer)
 
-def pipeline(images):
+def pipeline(images, original=False):
+    if original:
+        return pipe_original.fit_transform(images)
     return tda_pipeline.fit_transform(images)
